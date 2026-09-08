@@ -1,44 +1,35 @@
-# IPSA Prototype
 
-**Intelligent Password Security Analyzer (IPSA)**
+# IPSA V3 — Leakage-Aware Experimental Evaluation
 
-This prototype implements the methodology described in the RIC paper:
-- password feature extraction
-- entropy estimation
-- dictionary/sequential/repetition/keyboard pattern indicators
-- Random Forest classification
-- Accuracy, Precision, Recall, F1-score
-- confusion matrix
-- feature importance
-- Streamlit user interface
+## Purpose
+V1 used a benchmark whose class labels were perfectly separated by password length. A length-only decision tree also achieved 100%, demonstrating label leakage. V2 used frequency-rank exposure tiers but engineered features alone underperformed the length baseline.
 
-## Dataset
+V3 evaluates four models on the same held-out data:
+1. Length-only baseline.
+2. IPSA engineered features **excluding length**.
+3. Character-level TF-IDF (2–5 character n-grams).
+4. Combined character TF-IDF + IPSA engineered features.
 
-Use a CSV with:
-```text
-password,strength
-example123,0
-Example@2026,1
-...
-```
-
-Recommended public benchmark: the Password Strength Classifier dataset (about 669k labeled passwords) is described in multiple public ML studies. Its labels are pre-existing strength categories, so results should be described as classification performance on that benchmark, not as proof of real-world cracking resistance.
+The target is **empirical guessability/exposure tier**, not an absolute password-security score:
+- 0: top 10% most frequent passwords (high exposure)
+- 1: next 40% (medium exposure)
+- 2: bottom 50% of the downloaded corpus (lower exposure)
 
 ## Run
-
-```bash
-pip install -r requirements.txt
-python train_model.py --data passwords.csv
-streamlit run app.py
+Open CMD in this folder:
+```bat
+python -m pip install -r requirements_v3.txt
+python download_rockyou.py
+python train_v3.py
 ```
 
-Training produces:
-- `model/metrics.json`
-- `model/classification_report.txt`
-- `model/confusion_matrix.png`
-- `model/feature_importance.csv`
-- `model/ipsa_random_forest.joblib`
+Outputs:
+- `model_v3/metrics.json`
+- `model_v3/classification_reports.txt`
+- `model_v3/confusion_matrix_combined.csv`
+- `model_v3/ipsa_v3_combined.joblib`
 
 ## Research caution
+This is a benchmark evaluation, not evidence of real-world cracking resistance. RockYou-derived data is breached-password data and should be used only for authorized academic/security research. Do not publish plaintext password records. Report aggregate metrics only.
 
-Do not put accuracy/precision/recall/F1 values into the paper until the actual training script has been run on the final dataset. Also, because many public password-strength datasets have labels derived from existing strength rules/meters, the paper should avoid claiming that the classifier proves resistance to real password cracking unless an independent attack-resistance evaluation is performed.
+Do not claim that V3 is "more accurate" unless its test metrics actually exceed the stated baseline. Do not use any metric before the script produces it on the held-out test set.
