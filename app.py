@@ -19,7 +19,7 @@ st.set_page_config(
 # --------------------------------------------------
 # Load trained model
 # --------------------------------------------------
-MODEL_PATH = "model_v3_fast\\ipsa_v3_fast_combined.joblib"
+MODEL_PATH = "model_v3_fast/ipsa_v3_fast_combined.joblib"
 
 @st.cache_resource
 def load_model():
